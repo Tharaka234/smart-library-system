@@ -3,10 +3,12 @@ package com.example.smartlibrary.controller;
 import com.example.smartlibrary.model.Borrow;
 import com.example.smartlibrary.service.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/borrows")
@@ -15,11 +17,21 @@ public class BorrowController {
     @Autowired
     private BorrowService borrowService;
 
+    // Add new borrow record with proper error handling
     @PostMapping
-    public Borrow addBorrow(@RequestBody Borrow borrow) {
-        return borrowService.addBorrow(borrow);
+    public ResponseEntity<?> addBorrow(@RequestBody Borrow borrow) {
+        try {
+            Borrow savedBorrow = borrowService.addBorrow(borrow);
+            return ResponseEntity.ok(savedBorrow);
+        } catch (RuntimeException e) {
+            // Return 400 Bad Request with error message instead of 500
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
+    // Get all borrow records or filter by userId/bookId
     @GetMapping
     public List<Borrow> getAllBorrows(
             @RequestParam(required = false) Long userId,
@@ -28,17 +40,33 @@ public class BorrowController {
         return borrowService.filterBorrows(userId, bookId);
     }
 
+    // Delete a borrow record
     @DeleteMapping("/{id}")
-    public void deleteBorrow(@PathVariable Long id) {
-        borrowService.deleteBorrow(id);
+    public ResponseEntity<?> deleteBorrow(@PathVariable Long id) {
+        try {
+            borrowService.deleteBorrow(id);
+            return ResponseEntity.ok(Map.of("message", "Borrow record deleted successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
+    // Update return date and mark book as available
     @PutMapping("/{id}/return")
-    public Borrow updateReturnDate(
+    public ResponseEntity<?> updateReturnDate(
             @PathVariable Long id,
             @RequestParam String date
     ) {
-        LocalDate returnDate = LocalDate.parse(date);
-        return borrowService.updateReturnDate(id, returnDate);
+        try {
+            LocalDate returnDate = LocalDate.parse(date);
+            Borrow updatedBorrow = borrowService.updateReturnDate(id, returnDate);
+            return ResponseEntity.ok(updatedBorrow);
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }

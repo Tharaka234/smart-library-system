@@ -55,12 +55,14 @@ public class BorrowService {
         Borrow borrow = borrowRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow record not found"));
 
+        // Set return date and mark as returned
         borrow.setReturnDate(returnDate);
         borrow.setReturned(true);
 
+        // Update book availability
         Book book = borrow.getBook();
         if (book != null) {
-            book.setStatus("available");
+            book.setStatus("available"); // Mark book available when returned
             bookRepository.save(book);
         }
 
