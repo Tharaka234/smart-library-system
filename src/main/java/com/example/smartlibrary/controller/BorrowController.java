@@ -24,7 +24,6 @@ public class BorrowController {
             Borrow savedBorrow = borrowService.addBorrow(borrow);
             return ResponseEntity.ok(savedBorrow);
         } catch (RuntimeException e) {
-            // Return 400 Bad Request with error message instead of 500
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("error", e.getMessage()));
@@ -67,6 +66,34 @@ public class BorrowController {
             return ResponseEntity
                     .badRequest()
                     .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    //  Overdue by dueDate and null returnDate
+    @GetMapping("/overdue/by-due-date")
+    public ResponseEntity<?> getOverdueBorrowsByDueDate() {
+        try {
+            List<Borrow> overdueList = borrowService.getOverdueBorrowsByDueDate();
+            if (overdueList.isEmpty()) {
+                return ResponseEntity.ok(Map.of("message", "No overdue books found (due date logic)"));
+            }
+            return ResponseEntity.ok(overdueList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    //  Overdue by returnDate and returned flag
+    @GetMapping("/overdue/by-return-date")
+    public ResponseEntity<?> getOverdueBorrowsByReturnDate() {
+        try {
+            List<Borrow> overdueList = borrowService.getOverdueBorrowsByReturnDate();
+            if (overdueList.isEmpty()) {
+                return ResponseEntity.ok(Map.of("message", "No overdue books found (return date logic)"));
+            }
+            return ResponseEntity.ok(overdueList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }

@@ -15,6 +15,7 @@ public class Borrow {
     private Long id;
 
     private LocalDate borrowDate;
+    private LocalDate dueDate;       // ✅ Added this field
     private LocalDate returnDate;
     private boolean returned;
 
