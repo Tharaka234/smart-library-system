@@ -78,4 +78,16 @@ public class BorrowService {
         }
         return borrowRepository.findAll();
     }
+
+    // ✅ Overdue logic using dueDate and null returnDate
+    public List<Borrow> getOverdueBorrowsByDueDate() {
+        LocalDate today = LocalDate.now();
+        return borrowRepository.findByReturnDateIsNullAndDueDateBefore(today);
+    }
+
+    // ✅ Overdue logic using returned flag and returnDate
+    public List<Borrow> getOverdueBorrowsByReturnDate() {
+        LocalDate today = LocalDate.now();
+        return borrowRepository.findOverdueBorrows(today);
+    }
 }

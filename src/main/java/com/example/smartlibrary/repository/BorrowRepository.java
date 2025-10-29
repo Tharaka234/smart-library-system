@@ -14,6 +14,8 @@ public interface BorrowRepository extends JpaRepository<Borrow, Long> {
 
     List<Borrow> findByBook_Id(Long bookId);
 
+    List<Borrow> findByReturnDateIsNullAndDueDateBefore(LocalDate today);
+
     // 🆕 Overdue filter: books not returned and returnDate < today
     @Query("SELECT b FROM Borrow b WHERE b.returned = false AND b.returnDate < :today")
     List<Borrow> findOverdueBorrows(@Param("today") LocalDate today);
