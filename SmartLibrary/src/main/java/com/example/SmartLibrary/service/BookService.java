@@ -1,9 +1,7 @@
 package com.example.SmartLibrary.service;
 
-
-
-import com.example.smartlibrary.model.Book;
-import com.example.smartlibrary.repository.BookRepository;
+import com.example.SmartLibrary.model.Book;
+import com.example.SmartLibrary.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
