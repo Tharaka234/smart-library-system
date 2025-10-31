@@ -1,9 +1,8 @@
-git statuspackage com.example.SmartLibrary.model;
+package com.example.smartlibrary.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Getter
