@@ -1,7 +1,7 @@
 package com.example.SmartLibrary.controller;
 
-import com.example.smartlibrary.model.Borrow;
-import com.example.smartlibrary.service.BorrowService;
+import com.example.SmartLibrary.model.Borrow;
+import com.example.SmartLibrary.service.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,88 +12,120 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/borrows")
+@CrossOrigin(origins = "*")
 public class BorrowController {
 
     @Autowired
     private BorrowService borrowService;
 
-    // Add new borrow record with proper error handling
+    // ------------------ User endpoints ------------------
+
+    // User adds a borrow
     @PostMapping
-    public ResponseEntity<?> addBorrow(@RequestBody Borrow borrow) {
+    public ResponseEntity<?> userAddBorrow(@RequestBody Borrow borrow) {
         try {
-            Borrow savedBorrow = borrowService.addBorrow(borrow);
-            return ResponseEntity.ok(savedBorrow);
+            Borrow saved = borrowService.addBorrow(borrow);
+            return ResponseEntity.ok(saved);
         } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    // Get all borrow records or filter by userId/bookId
+    // User views own borrows (optional filters)
     @GetMapping
-    public List<Borrow> getAllBorrows(
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Long bookId
-    ) {
-        return borrowService.filterBorrows(userId, bookId);
+    public ResponseEntity<?> getUserBorrows(@RequestParam(required = false) Long userId,
+                                            @RequestParam(required = false) Long bookId) {
+        try {
+            List<Borrow> borrows = borrowService.filterBorrows(userId, bookId);
+            if (borrows.isEmpty()) return ResponseEntity.ok(Map.of("message", "No borrow records found"));
+            return ResponseEntity.ok(borrows);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-    // Delete a borrow record
+    // User returns book
+    @PutMapping("/{id}/return")
+    public ResponseEntity<?> userReturnBook(@PathVariable Long id, @RequestParam String date) {
+        try {
+            LocalDate returnDate = LocalDate.parse(date);
+            Borrow updated = borrowService.updateReturnDate(id, returnDate);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ------------------ Admin endpoints ------------------
+
+    // Admin: all borrows with filters
+    @GetMapping("/admin/all")
+    public ResponseEntity<?> getAllBorrowsAdmin(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long bookId) {
+        try {
+            List<Borrow> borrows = borrowService.filterBorrows(userId, bookId);
+            return ResponseEntity.ok(borrows);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // Admin deletes borrow
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBorrow(@PathVariable Long id) {
         try {
             borrowService.deleteBorrow(id);
             return ResponseEntity.ok(Map.of("message", "Borrow record deleted successfully"));
         } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    // Update return date and mark book as available
-    @PutMapping("/{id}/return")
-    public ResponseEntity<?> updateReturnDate(
-            @PathVariable Long id,
-            @RequestParam String date
-    ) {
-        try {
-            LocalDate returnDate = LocalDate.parse(date);
-            Borrow updatedBorrow = borrowService.updateReturnDate(id, returnDate);
-            return ResponseEntity.ok(updatedBorrow);
-        } catch (RuntimeException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
+    // Admin overdue by due date
+    @GetMapping("/admin/overdue/by-due-date")
+    public ResponseEntity<?> getOverdueByDueDateAdmin() {
+        return getOverdueByDueDate();
     }
 
-    //  Overdue by dueDate and null returnDate
+    // Admin overdue by return date
+    @GetMapping("/admin/overdue/by-return-date")
+    public ResponseEntity<?> getOverdueByReturnDateAdmin() {
+        return getOverdueByReturnDate();
+    }
+
+    // Admin stats
+    @GetMapping("/admin/stats")
+    public ResponseEntity<?> getStatsAdmin() {
+        return getStats();
+    }
+
+
     @GetMapping("/overdue/by-due-date")
-    public ResponseEntity<?> getOverdueBorrowsByDueDate() {
+    public ResponseEntity<?> getOverdueByDueDate() {
         try {
-            List<Borrow> overdueList = borrowService.getOverdueBorrowsByDueDate();
-            if (overdueList.isEmpty()) {
-                return ResponseEntity.ok(Map.of("message", "No overdue books found (due date logic)"));
-            }
-            return ResponseEntity.ok(overdueList);
+            List<Borrow> overdue = borrowService.getOverdueBorrowsByDueDate();
+            if (overdue.isEmpty()) return ResponseEntity.ok(Map.of("message", "No overdue books (due date)"));
+            return ResponseEntity.ok(overdue);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    //  Overdue by returnDate and returned flag
     @GetMapping("/overdue/by-return-date")
-    public ResponseEntity<?> getOverdueBorrowsByReturnDate() {
+    public ResponseEntity<?> getOverdueByReturnDate() {
         try {
-            List<Borrow> overdueList = borrowService.getOverdueBorrowsByReturnDate();
-            if (overdueList.isEmpty()) {
-                return ResponseEntity.ok(Map.of("message", "No overdue books found (return date logic)"));
-            }
-            return ResponseEntity.ok(overdueList);
+            List<Borrow> overdue = borrowService.getOverdueBorrowsByReturnDate();
+            if (overdue.isEmpty()) return ResponseEntity.ok(Map.of("message", "No overdue books (return date)"));
+            return ResponseEntity.ok(overdue);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Long>> getStats() {
+        return ResponseEntity.ok(borrowService.getBorrowStats());
+    }
+
 }
