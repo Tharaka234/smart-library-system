@@ -1,4 +1,4 @@
-package com.example.SmartLibrary.model;
+package com.example.sampleproject.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -11,20 +11,26 @@ public class Borrow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
+    @Column(name = "borrow_date")
     private LocalDate borrowDate;
+
+    @Column(name = "due_date")
     private LocalDate dueDate;
+
+    @Column(name = "return_date")
     private LocalDate returnDate;
 
     private boolean returned = false;
 
+    // Constructors
     public Borrow() {}
 
     public Borrow(User user, Book book, LocalDate borrowDate, LocalDate dueDate) {
