@@ -69,7 +69,7 @@ smart-library-system/
 │   │   │   ├── Book.java
 │   │   │   └── Borrow.java
 │   │   │   └── Admin.java
-│   │   │       └── Notification.java
+│   │   │   └── Notification.java
 │   │   │
 │   │   ├── repository/
 │   │   │   ├── UserRepository.java
@@ -94,24 +94,33 @@ smart-library-system/
 │   │   │       ├── AdminController.java
 │   │   │       
 │   │   │
-│   │   └── util/
-│   │       └── EmailService.java
+│   │   └── dto/
+│   │       └── BorrowRequest.java
 │   │
 │   └── resources/
 │       ├── application.properties
 │       ├── static/
 │       │   ├── css/
-│       │   │   └── style.css
+│       │   │   ├── borrow-user.css
+│       │   │   
 │       │   ├── js/
-│       │   │   ├── auth.js
-│       │   │   ├── books.js
-│       │   │   ├── admin.js
-│       │   │   └── borrow.js
+│       │   │   ├── admin-auth.js
+│       │   │   ├── notification.js
+│       │   │   ├── borrow-admin.js
+│       │   │   └── borrow-user.js
+│       │   │ 
 │       │   ├── login.html
 │       │   ├── register.html
 │       │   ├── books.html
-│       │   ├── admin.html
-│       │   └── add-book.html
+│       │   ├── admin-panel.html
+│       │   └── admin-register.html
+│       │   └── admin-login.html
+│       │   └── borrow-admin.html
+│       │   └── borrow-user.html
+│       │   └── notification.html
+│       │   └── user-dashboard.html
+│       │   └── video3.mp4
+│       │   └── video4.mp4
 │       └── templates/ (optional for Thymeleaf)
 │
 ├── pom.xml
