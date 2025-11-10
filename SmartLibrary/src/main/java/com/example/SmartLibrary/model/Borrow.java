@@ -1,4 +1,4 @@
-package com.example.sampleproject.model;
+package com.example.SmartLibrary.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;

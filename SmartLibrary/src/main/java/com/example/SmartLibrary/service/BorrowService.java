@@ -1,11 +1,11 @@
-package com.example.sampleproject.service;
+package com.example.SmartLibrary.service;
 
-import com.example.sampleproject.model.Book;
-import com.example.sampleproject.model.Borrow;
-import com.example.sampleproject.model.User;
-import com.example.sampleproject.repository.BookRepository;
-import com.example.sampleproject.repository.BorrowRepository;
-import com.example.sampleproject.repository.UserRepository;
+import com.example.SmartLibrary.model.Book;
+import com.example.SmartLibrary.model.Borrow;
+import com.example.SmartLibrary.model.User;
+import com.example.SmartLibrary.repository.BookRepository;
+import com.example.SmartLibrary.repository.BorrowRepository;
+import com.example.SmartLibrary.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

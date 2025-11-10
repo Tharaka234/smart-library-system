@@ -1,6 +1,6 @@
-package com.example.sampleproject.repository;
+package com.example.SmartLibrary.repository;
 
-import com.example.sampleproject.model.Borrow;
+import com.example.SmartLibrary.model.Borrow;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

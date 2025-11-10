@@ -1,11 +1,11 @@
-package com.example.sampleproject.controller;
+package com.example.SmartLibrary.controller;
 
-import com.example.sampleproject.model.Borrow;
-import com.example.sampleproject.repository.UserRepository;
-import com.example.sampleproject.service.BorrowService;
-import com.example.sampleproject.dto.BorrowRequest;
-import com.example.sampleproject.repository.BookRepository;
-import com.example.sampleproject.repository.BorrowRepository;
+import com.example.SmartLibrary.model.Borrow;
+import com.example.SmartLibrary.repository.UserRepository;
+import com.example.SmartLibrary.service.BorrowService;
+import com.example.SmartLibrary.dto.BorrowRequest;
+import com.example.SmartLibrary.repository.BookRepository;
+import com.example.SmartLibrary.repository.BorrowRepository;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
