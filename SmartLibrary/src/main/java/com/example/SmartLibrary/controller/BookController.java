@@ -1,7 +1,10 @@
 package com.example.SmartLibrary.controller;
 
 import com.example.SmartLibrary.model.Book;
+import com.example.SmartLibrary.model.Notification;
 import com.example.SmartLibrary.repository.BookRepository;
+import com.example.SmartLibrary.repository.NotificationRepository;
+import com.example.SmartLibrary.dto.BorrowRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -20,21 +24,34 @@ public class BookController {
     @Autowired
     private BookRepository bookRepository;
 
-    // Search + list
+    @Autowired
+    private NotificationRepository notificationRepository;
+
+    // Search with list
     @GetMapping
     public List<Book> getAll(@RequestParam(defaultValue = "") String search) {
         if (search.isEmpty()) return bookRepository.findAll();
         return bookRepository.findByTitleContainingIgnoreCase(search);
     }
 
-    // Add new book (THIS IS THE ONLY ADD BOOK ENDPOINT)
+    // Add new book
     @PostMapping
     public ResponseEntity<String> addBook(@RequestBody Book book) {
         if (book.getAuthor() == null || book.getAuthor().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Author is required");
         }
         try {
-            bookRepository.save(book);
+            Book saved = bookRepository.save(book);
+
+            // Create notification for all users (userId null => broadcast)
+            String msg = "New book added: " + (saved.getTitle() != null ? saved.getTitle() : "Untitled");
+            Notification n = new Notification();
+            n.setMessage(msg);
+            n.setCreatedAt(LocalDateTime.now());
+            n.setUserId(null);
+            notificationRepository.save(n);
+            System.out.println("[Notification] " + msg);
+
             return ResponseEntity.ok("Book added successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,7 +62,7 @@ public class BookController {
 
     // Update existing book
     @PutMapping("/{id}")
-    public String updateBook(@PathVariable Long id, @RequestBody Book updatedBook) {
+    public ResponseEntity<String> updateBook(@PathVariable Long id, @RequestBody Book updatedBook) {
         return bookRepository.findById(id).map(book -> {
             book.setTitle(updatedBook.getTitle());
             book.setAuthor(updatedBook.getAuthor());
@@ -53,16 +70,46 @@ public class BookController {
             book.setPublicationYear(updatedBook.getPublicationYear());
             book.setImageUrl(updatedBook.getImageUrl());
             bookRepository.save(book);
-            return "Book updated successfully!";
-        }).orElse("Book not found!");
+
+            // Notification
+            String msg = "Book updated: " + (book.getTitle() != null ? book.getTitle() : ("ID " + id));
+            Notification n = new Notification();
+            n.setMessage(msg);
+            n.setCreatedAt(LocalDateTime.now());
+            n.setUserId(null);
+            notificationRepository.save(n);
+            System.out.println("[Notification] " + msg);
+
+            return ResponseEntity.ok("Book updated successfully!");
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found!"));
     }
 
     // Delete a book
     @DeleteMapping("/{id}")
-    public String deleteBook(@PathVariable Long id) {
-        if (!bookRepository.existsById(id)) return "Book not found!";
-        bookRepository.deleteById(id);
-        return "Book deleted successfully!";
+    public ResponseEntity<String> deleteBook(@PathVariable Long id) {
+        if (!bookRepository.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Book not found!");
+        }
+        try {
+            Book book = bookRepository.findById(id).orElse(null);
+            String title = (book != null && book.getTitle() != null) ? book.getTitle() : ("ID " + id);
+
+            bookRepository.deleteById(id);
+
+            // Notification
+            String msg = "Book deleted: " + title;
+            Notification n = new Notification();
+            n.setMessage(msg);
+            n.setCreatedAt(LocalDateTime.now());
+            n.setUserId(null);
+            notificationRepository.save(n);
+            System.out.println("[Notification] " + msg);
+
+            return ResponseEntity.ok("Book deleted successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Delete failed: " + e.getMessage());
+        }
     }
 
     // Upload photo endpoint
@@ -84,7 +131,7 @@ public class BookController {
         }
     }
 
-    //  Borrow book endpoint
+    // Borrow book endpoint
     @PostMapping("/borrow")
     public String borrowBook(@RequestBody BorrowRequest request) {
         if (request.getBookId() == null || request.getBorrowDate() == null || request.getReturnDate() == null) {
