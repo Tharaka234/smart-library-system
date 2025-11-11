@@ -97,8 +97,8 @@ src/
 | `POST` | `/api/borrows/borrow/{id}` | Borrow a book |
 | `POST` | `/api/borrows/return/{id}` | Return a book |
 
-# ⚙️ How to Run the Project
-##1️⃣ Clone Repository
+⚙️ How to Run the Project
+#1️⃣ Clone Repository
 ```bash
 git clone https://github.com/Tharaka234/smart-library-system.git
 
