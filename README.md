@@ -101,6 +101,8 @@ src/
 #1️⃣ Clone Repository
 ```bash
 git clone https://github.com/Tharaka234/smart-library-system.git
+#Database Tabel
+https://nsbm365-my.sharepoint.com/:w:/g/personal/gylayapa_students_nsbm_ac_lk/IQAe3T13Y9EvT4cZkTqjJYs4Ad8jnjhicV4ZyfJuygrB350?e=5NOBJG
 
 # 🔮 Future Improvements
 
