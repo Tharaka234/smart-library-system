@@ -222,7 +222,7 @@ public class BorrowService {
         }
     }
 
-    @Scheduled(fixedRate = 300000) // Run every 5 minutes
+    @Scheduled(fixedRate = 60000) // Run every 5 minutes
     public void sendDueDateReminders() {
         try {
             List<Borrow> activeBorrows = borrowRepository.findByReturnedFalse();
